@@ -1,32 +1,56 @@
+
 <div class="container">
-  <div cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="dropQuestion($event)" class="question-list">
-    <div *ngFor="let question of questions; let i = index" cdkDrag >
-      <div class="question">
-        <div style="background-color: red; display: inline-block;" cdkDragHandle>sposta</div>
-        <p>Question: <ckeditor [config]="ckEditoConfig" [(ngModel)]="question.question" class="question-input" [editor]="Editor" data=""> </ckeditor></p>
-        <button *ngIf="questions.length > 2" (click)="removeQuestion(i)" class="remove-option-btn">Remove Question</button>
+  
+  <h2>Angular Reactive Form</h2>
+  
+
+  <div class="question-list" cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="dropQuestion($event)">
+    <div class="question-item" *ngFor="let question of questions; let i = index" cdkDrag>
+       <div class="question">  
+        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" [(ngModel)]="question.question" [editor]="Editor" data="{{question.question}}"></ckeditor>
+        <button cdkDragHandle>Sposta</button>
+        <button class="btn btn-danger btn-sm" (click)="removeQuestion(i)">Delete</button>
       </div>
-      <div cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption(i , $event)" class="option-list">
-        <div *ngFor="let option of question.options; let j = index" cdkDrag class="option">
-          <div style="background-color: red; display: inline-block;" cdkDragHandle>sposta</div>
+      <div class="options" cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption(i , $event)">
+        <div class="option" *ngFor="let option of question.options; let j = index" cdkDrag>
+          <button cdkDragHandle>sposta</button>
           <input type="radio" [value]="option.value" [name]="question.question"> {{option.option}}
-          <button *ngIf="question.options.length > 2" (click)="removeOption(i, j)" class="remove-option-btn">Remove Option</button>
+          <button class="btn btn-danger btn-sm" *ngIf="question.options.length > 2" (click)="removeOption(i, j)">Delete</button>
         </div>
+        
+        <div *ngIf="question.showInput">
+          <form [formGroup]="optionForm" (ngSubmit)="addOption(question)">
+            <input type="text" formControlName="newOption">
+            <button type="submit">Add</button>
+          </form>
+        </div>
+        <button class="btn btn-primary btn-sm" (click)="toggleOptionInput(question)">{{question.showInput ? 'Cancel' : 'Add'}}</button>
       </div>
-      <div class="question" *ngIf="question.showInput">
-        <p><input *ngIf="question.showInput" [(ngModel)]="question.newOption" class="new-option-input"></p>
-        <button (click)="addOption(question); question.showInput = false" class="add-option-btn">Add Option</button>
-      </div>
-      <button (click)="question.showInput = !question.showInput">{{question.showInput ? 'Cancel' : 'Add'}}</button>
     </div>
   </div>
+
+  <hr>
   <div *ngIf="showQuestionModel">
-    <p>Question:<ckeditor [config]="ckEditoConfig" [(ngModel)]="newQuestion" [editor]="Editor"></ckeditor></p>
-    <p>Option: <input [(ngModel)]="newOption" class="new-option-input"></p>
-    <p>{{questionError}}</p>
-    <button (click)="addQuestion(); showQuestionModel = false">Add Question</button>
-    <button (click)="showQuestionModel = false">Cancel</button>
+    <form [formGroup]="questionForm">
+      <div class="form-group">
+        <label for="questionInput">Question</label>
+        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" formControlName="question" [editor]="Editor"></ckeditor>
+        <div *ngIf="questionControl?.invalid && questionControl?.touched" class="text-danger">
+          Question is required.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="optionInput">Option</label>
+        <input  type="text" id="optionInput" class="form-control" formControlName="option">
+        <div *ngIf="optionControl?.invalid && optionControl?.touched" class="text-danger">
+          Option is required.
+        </div>
+      </div>
+      <button class="btn btn-primary" type="button" (click)="addQuestion()" [disabled]="questionForm.invalid">Save</button>
+    </form>
   </div>
-  <button (click)="showQuestionModel = true">Add Question</button>
-  <button (click)="saveChanges()">Save Changes</button>
+  <button class="btn btn-primary" (click)="toggleQuestionModal()"> {{showQuestionModel ? 'Cancel' : 'Add Question'}} </button>
+  <button class="btn btn-primary" (click)="saveChanges()">Save Changes</button>
 </div>
+
+
