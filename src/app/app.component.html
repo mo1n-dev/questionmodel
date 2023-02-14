@@ -12,11 +12,29 @@
         <button class="btn btn-danger btn-sm" (click)="removeQuestion(i)">Delete</button>
       </div>
       <div class="options" cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption(i , $event)">
-        <div class="option" *ngFor="let option of question.options; let j = index" cdkDrag>
+        <!-- <div class="option" *ngFor="let option of question.options; let j = index" cdkDrag>
           <button cdkDragHandle>sposta</button>
           <input type="radio" [value]="option.value" [name]="question.question"> {{option.option}}
           <button class="btn btn-danger btn-sm" *ngIf="question.options.length > 2" (click)="removeOption(i, j)">Delete</button>
-        </div>
+        </div> -->
+
+        <table class="table table-striped">
+	<thead>
+		<tr>
+			<th scope="col">Sposta</th>
+			<th scope="col">Coretta</th>
+			<th scope="col">Testo</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr *ngFor="let option of question.options; let j = index" cdkDrag>
+			<td><button cdkDragHandle>sposta</button></td>
+			<td><input type="radio" [value]="option.value" [name]="question.question"></td>
+			<td> {{option.option}}</td>
+      <td><button class="btn btn-danger btn-sm" *ngIf="question.options.length > 2" (click)="removeOption(i, j)">Delete</button></td>
+		</tr>
+	</tbody>
+</table>
         
         <div *ngIf="question.showInput">
           <form [formGroup]="optionForm" (ngSubmit)="addOption(question)">
@@ -28,6 +46,7 @@
       </div>
     </div>
   </div>
+           
 
   <hr>
   <div *ngIf="showQuestionModel">
