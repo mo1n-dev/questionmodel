@@ -3,21 +3,15 @@
   
   <h2>Angular Reactive Form</h2>
   
-
-  <div class="question-list" cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="dropQuestion($event)">
+  
+  <div   class="question-list" cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="dropQuestion($event)">
     <div class="question-item" *ngFor="let question of questions; let i = index" cdkDrag>
        <div class="question">  
-        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" [(ngModel)]="question.question" [editor]="Editor" data="{{question.question}}"></ckeditor>
+        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" [(ngModel)]="question.question" [editor]="Editor" data="{{question.question}}" required="true"></ckeditor>
         <button cdkDragHandle>Sposta</button>
         <button class="btn btn-danger btn-sm" (click)="removeQuestion(i)">Delete</button>
       </div>
       <div class="options" cdkDropList [cdkDropListData]="question.options" (cdkDropListDropped)="dropOption(i , $event)">
-        <!-- <div class="option" *ngFor="let option of question.options; let j = index" cdkDrag>
-          <button cdkDragHandle>sposta</button>
-          <input type="radio" [value]="option.value" [name]="question.question"> {{option.option}}
-          <button class="btn btn-danger btn-sm" *ngIf="question.options.length > 2" (click)="removeOption(i, j)">Delete</button>
-        </div> -->
-
         <table class="table table-striped">
 	<thead>
 		<tr>
@@ -29,8 +23,8 @@
 	<tbody>
 		<tr *ngFor="let option of question.options; let j = index" cdkDrag>
 			<td><button cdkDragHandle>sposta</button></td>
-			<td><input type="radio" [value]="option.value" [name]="question.question"></td>
-			<td> {{option.option}}</td>
+			<td><input type="radio" name="option{{i}}" (change)="setCorrectOption(i,j)" [checked]="option.isCorrect" required></td>
+			<td>{{option.option}}</td> 
       <td><button class="btn btn-danger btn-sm" *ngIf="question.options.length > 2" (click)="removeOption(i, j)">Delete</button></td>
 		</tr>
 	</tbody>
@@ -38,8 +32,8 @@
         
         <div *ngIf="question.showInput">
           <form [formGroup]="optionForm" (ngSubmit)="addOption(question)">
-            <input type="text" formControlName="newOption">
-            <button type="submit">Add</button>
+            <input type="text" formControlName="newOption" required>
+            <button type="submit" [disabled]="optionForm.invalid">Add</button>
           </form>
         </div>
         <button class="btn btn-primary btn-sm" (click)="toggleOptionInput(question)">{{question.showInput ? 'Cancel' : 'Add'}}</button>
@@ -53,14 +47,21 @@
     <form [formGroup]="questionForm">
       <div class="form-group">
         <label for="questionInput">Question</label>
-        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" formControlName="question" [editor]="Editor"></ckeditor>
+        <ckeditor  [config]="ckEditorConfig" type="text" id="questionInput" class="form-control" formControlName="question" [editor]="Editor" required="true"></ckeditor>
         <div *ngIf="questionControl?.invalid && questionControl?.touched" class="text-danger">
           Question is required.
         </div>
       </div>
       <div class="form-group">
         <label for="optionInput">Option</label>
-        <input  type="text" id="optionInput" class="form-control" formControlName="option">
+        <input  type="text" id="optionInput" class="form-control" formControlName="option" required>
+        <div *ngIf="optionControl?.invalid && optionControl?.touched" class="text-danger">
+          Option is required.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="optionInput">Option</label>
+        <input  type="text" id="optionInput" class="form-control" formControlName="option2" required>
         <div *ngIf="optionControl?.invalid && optionControl?.touched" class="text-danger">
           Option is required.
         </div>
@@ -71,5 +72,3 @@
   <button class="btn btn-primary" (click)="toggleQuestionModal()"> {{showQuestionModel ? 'Cancel' : 'Add Question'}} </button>
   <button class="btn btn-primary" (click)="saveChanges()">Save Changes</button>
 </div>
-
-
